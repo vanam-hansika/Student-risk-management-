@@ -1,0 +1,181 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "students_risk",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c0b90421-b014-4e8e-beda-0498fac396af",
+      "name": "Webhook",
+      "webhookId": "2889fccf-01eb-4ffd-8b50-d4a4c09449df"
+    },
+    {
+      "parameters": {
+        "jsCode": "let attendance = $json.body.attendance;\nlet marks = $json.body.marks;\nlet behavior = $json.body.behavior;\n\nlet risk = 0;\n\nif (attendance < 70) {\nrisk += 30;\n}\n\nif (marks < 50) {\nrisk += 30;\n}\n\nif (behavior < 4) {\nrisk += 40;\n}\n\nreturn [{\nname: $json.body.name,\nattendance: attendance,\nmarks: marks,\nbehavior: behavior,\nrisk_score: risk\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0d7dc6a7-08e4-4dba-97b9-da1147ba8a38",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8c86ca51-7a04-44f1-89a6-eb727bd100bd",
+              "leftValue": "={{$json.risk_score}} ",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "1c9d4351-ca97-4c35-af00-908b2c644345",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "bhavibtech@gmail.com",
+        "subject": "high risk student ALERT!",
+        "message": "=Student Risk Alert  Name: {{$json.name}} Attendance: {{$json.attendance}} Marks: {{$json.marks}} Risk Score: {{$json.risk_score}}  Recommendation: This student needs academic counseling.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "15073221-fae8-4527-a29a-8ba4692598a4",
+      "name": "Send a message",
+      "webhookId": "4dfac903-f0b7-42c3-b312-08188b57b180",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MCd6BfNRMvTjWTxE",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sreebhavi00@gmail.com",
+        "subject": "student status: Normal",
+        "message": "=Student Risk Status  Name: {{$json.name}} Attendance: {{$json.attendance}} Marks: {{$json.marks}} Risk Score: {{$json.risk_score}}  Status: Student is performing normally. No counseling required.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "d05583d5-f222-40ad-8d92-545593a4cf61",
+      "name": "Send a message1",
+      "webhookId": "5bcf77c6-226e-438b-b69e-110dffcd1c58",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MCd6BfNRMvTjWTxE",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9ac0cb40-775c-4c5d-bcf5-7309e8af775a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d5c0fbd12cb8dca2a1111d67652b7a57d0792c98b6a59e0eae362477c9b455e3"
+  },
+  "id": "sAu9r65OQ4GdHxeX",
+  "tags": []
+}
